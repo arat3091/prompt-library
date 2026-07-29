@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * REST Controller for Prompt API endpoints.
  */
 @RestController
-@RequestMapping("/api/prompts")
+@RequestMapping("/prompts")
 public class PromptController {
 
     private static final Logger logger = LoggerFactory.getLogger(PromptController.class);

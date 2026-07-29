@@ -1,3 +1,6 @@
+/* Include Material Design theme */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
 /* Global Styles */
 * {
   margin: 0;
@@ -5,50 +8,183 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
+  font-family: Roboto, Arial, sans-serif;
+  background-color: #fafafa;
   color: #333;
   line-height: 1.6;
+  margin: 0;
+  padding: 0;
 }
 
 app-root {
-  display: block;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
+app-header {
+  flex-shrink: 0;
+}
+
+router-outlet ~ * {
+  flex: 1;
+  overflow: auto;
+}
+
+/* Typography */
 h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5rem;
+  color: #333;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 500;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 500;
 }
 
 p {
   margin-bottom: 1rem;
 }
 
-button {
-  padding: 8px 16px;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
+/* Links */
+a {
+  color: #1976d2;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
-button:hover {
-  background-color: #1565c0;
-}
-
-input, textarea, select {
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+/* Form elements */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+textarea,
+select {
   font-family: inherit;
 }
 
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #1976d2;
-  box-shadow: 0 0 5px rgba(25, 118, 210, 0.3);
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  text-align: left;
+  padding: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Buttons (reset Material button styles) */
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Cards */
+mat-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Material specific adjustments */
+.mat-toolbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+/* Material dialog adjustments */
+::ng-deep .mat-mdc-dialog-container {
+  padding: 0 !important;
+}
+
+/* Material paginator adjustments */
+.mat-mdc-paginator {
+  background-color: #f5f5f5;
+}
+
+/* Scrollbar styling (WebKit browsers) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  th, td {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
 }

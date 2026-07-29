@@ -1,0 +1,34 @@
+<mat-toolbar color="primary">
+  <div class="toolbar-container">
+    <span class="app-title">Prompt Manager</span>
+
+    <div class="spacer"></div>
+
+    <!-- Login/Register Button (if not authenticated) -->
+    <button
+      *ngIf="!currentUser"
+      mat-raised-button
+      (click)="openAuthModal()">
+      Login / Register
+    </button>
+
+    <!-- User Menu (if authenticated) -->
+    <div *ngIf="currentUser" class="user-menu">
+      <button mat-button [matMenuTriggerFor]="userMenuPanel">
+        {{ currentUser.username }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #userMenuPanel="matMenu">
+        <button mat-menu-item disabled>
+          <mat-icon>person</mat-icon>
+          <span>{{ currentUser.email || 'Profile' }}</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</mat-toolbar>
