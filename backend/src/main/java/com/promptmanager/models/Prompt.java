@@ -46,14 +46,18 @@ public class Prompt {
     @Column(nullable = false)
     private Integer version = 1;
 
+    @Column(nullable = false)
+    private Long userId;
+
     // Constructors
     public Prompt() {
     }
 
-    public Prompt(String title, String content, String author) {
+    public Prompt(String title, String content, String author, Long userId) {
         this.title = title;
         this.content = content;
         this.author = author;
+        this.userId = userId;
     }
 
     // JPA Lifecycle Methods
@@ -142,6 +146,14 @@ public class Prompt {
         this.version = version;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -161,6 +173,7 @@ public class Prompt {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", author='" + author + '\'' +
+                ", userId=" + userId +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", version=" + version +

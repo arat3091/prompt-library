@@ -11,24 +11,28 @@ class PromptTest {
 
     @Test
     void testPromptCreation() {
-        Prompt prompt = new Prompt("Test Title", "Test Content", "author");
+        Prompt prompt = new Prompt("Test Title", "Test Content", "author", 1L);
 
         assertNotNull(prompt);
         assertEquals("Test Title", prompt.getTitle());
         assertEquals("Test Content", prompt.getContent());
         assertEquals("author", prompt.getAuthor());
+        assertEquals(1L, prompt.getUserId());
     }
 
     @Test
     void testPromptWithDescription() {
         Prompt prompt = new Prompt();
+        prompt.setId(1L);
         prompt.setTitle("Title");
         prompt.setContent("Content");
         prompt.setDescription("Description");
         prompt.setCategory("Category");
+        prompt.setUserId(1L);
 
         assertEquals("Description", prompt.getDescription());
         assertEquals("Category", prompt.getCategory());
+        assertEquals(1L, prompt.getUserId());
     }
 
     @Test

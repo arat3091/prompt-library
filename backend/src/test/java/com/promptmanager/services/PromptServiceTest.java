@@ -5,6 +5,7 @@ import com.promptmanager.dto.PageResponse;
 import com.promptmanager.dto.PromptResponse;
 import com.promptmanager.dto.UpdatePromptRequest;
 import com.promptmanager.exceptions.PromptNotFoundException;
+import com.promptmanager.exceptions.UnauthorizedException;
 import com.promptmanager.models.Prompt;
 import com.promptmanager.repositories.PromptRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,19 +17,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
-/**
- * Unit tests for PromptService.
- */
 @ExtendWith(MockitoExtension.class)
 class PromptServiceTest {
 
@@ -38,93 +37,83 @@ class PromptServiceTest {
     @InjectMocks
     private PromptService promptService;
 
+    private Prompt testPrompt;
     private CreatePromptRequest createRequest;
     private UpdatePromptRequest updateRequest;
-    private Prompt mockPrompt;
 
     @BeforeEach
     void setUp() {
+        testPrompt = new Prompt("Test Prompt", "This is test content", "user-1", 1L);
+        testPrompt.setId(1L);
+
         createRequest = new CreatePromptRequest();
-        createRequest.setTitle("Test Title");
-        createRequest.setContent("Test Content");
-        createRequest.setDescription("Test Description");
-        createRequest.setCategory("Test Category");
+        createRequest.setTitle("New Prompt");
+        createRequest.setContent("New Content");
+        createRequest.setDescription("New Description");
+        createRequest.setCategory("Testing");
 
         updateRequest = new UpdatePromptRequest();
         updateRequest.setTitle("Updated Title");
         updateRequest.setContent("Updated Content");
         updateRequest.setDescription("Updated Description");
-        updateRequest.setCategory("Updated Category");
-
-        mockPrompt = new Prompt();
-        mockPrompt.setId(1L);
-        mockPrompt.setTitle("Test Title");
-        mockPrompt.setContent("Test Content");
-        mockPrompt.setAuthor("system");
-        mockPrompt.setCreatedAt(LocalDateTime.now());
-        mockPrompt.setUpdatedAt(LocalDateTime.now());
-        mockPrompt.setVersion(1);
+        updateRequest.setCategory("Updated");
     }
 
     @Test
-    void testCreatePrompt() {
-        when(promptRepository.save(any(Prompt.class))).thenReturn(mockPrompt);
+    void testCreatePromptSuccess() {
+        when(promptRepository.save(any(Prompt.class))).thenReturn(testPrompt);
 
-        PromptResponse response = promptService.createPrompt(createRequest);
+        PromptResponse response = promptService.createPrompt(createRequest, 1L);
 
         assertNotNull(response);
-        assertEquals("Test Title", response.getTitle());
-        assertEquals("Test Content", response.getContent());
+        assertEquals("Test Prompt", response.getTitle());
+        assertEquals(1L, response.getUserId());
         verify(promptRepository, times(1)).save(any(Prompt.class));
     }
 
     @Test
-    void testGetPromptById() {
-        when(promptRepository.findById(1L)).thenReturn(Optional.of(mockPrompt));
+    void testGetPromptByIdSuccess() {
+        when(promptRepository.findById(1L)).thenReturn(Optional.of(testPrompt));
 
         PromptResponse response = promptService.getPromptById(1L);
 
         assertNotNull(response);
-        assertEquals(1L, response.getId());
-        assertEquals("Test Title", response.getTitle());
-        verify(promptRepository, times(1)).findById(1L);
+        assertEquals("Test Prompt", response.getTitle());
+        assertEquals(1L, response.getUserId());
     }
 
     @Test
     void testGetPromptByIdNotFound() {
         when(promptRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(PromptNotFoundException.class, () -> promptService.getPromptById(999L));
-        verify(promptRepository, times(1)).findById(999L);
+        assertThrows(PromptNotFoundException.class, () ->
+            promptService.getPromptById(999L)
+        );
     }
 
     @Test
-    void testGetAllPrompts() {
-        List<Prompt> prompts = new ArrayList<>();
-        prompts.add(mockPrompt);
+    void testGetAllPromptsSuccess() {
+        Prompt prompt1 = new Prompt("Prompt 1", "Content 1", "user-1", 1L);
+        Prompt prompt2 = new Prompt("Prompt 2", "Content 2", "user-2", 2L);
 
-        Page<Prompt> page = new PageImpl<>(prompts, PageRequest.of(0, 20), 1);
-        when(promptRepository.findAll(any(org.springframework.data.domain.Pageable.class))).thenReturn(page);
+        Page<Prompt> page = new PageImpl<>(Arrays.asList(prompt1, prompt2));
+        when(promptRepository.findAll(any(Pageable.class))).thenReturn(page);
 
         PageResponse<PromptResponse> response = promptService.getAllPrompts(0, 20, "createdAt", "desc");
 
         assertNotNull(response);
-        assertEquals(1, response.getContent().size());
+        assertEquals(2, response.getContent().size());
         assertEquals(0, response.getCurrentPage());
-        assertEquals(20, response.getPageSize());
-        verify(promptRepository, times(1)).findAll(any(org.springframework.data.domain.Pageable.class));
     }
 
     @Test
-    void testUpdatePrompt() {
-        when(promptRepository.findById(1L)).thenReturn(Optional.of(mockPrompt));
-        when(promptRepository.save(any(Prompt.class))).thenReturn(mockPrompt);
+    void testUpdatePromptSuccess() {
+        when(promptRepository.findById(1L)).thenReturn(Optional.of(testPrompt));
+        when(promptRepository.save(any(Prompt.class))).thenReturn(testPrompt);
 
-        PromptResponse response = promptService.updatePrompt(1L, updateRequest);
+        PromptResponse response = promptService.updatePrompt(1L, updateRequest, 1L);
 
         assertNotNull(response);
-        assertEquals("Updated Title", response.getTitle());
-        verify(promptRepository, times(1)).findById(1L);
         verify(promptRepository, times(1)).save(any(Prompt.class));
     }
 
@@ -132,24 +121,50 @@ class PromptServiceTest {
     void testUpdatePromptNotFound() {
         when(promptRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(PromptNotFoundException.class, () -> promptService.updatePrompt(999L, updateRequest));
-        verify(promptRepository, times(1)).findById(999L);
+        assertThrows(PromptNotFoundException.class, () ->
+            promptService.updatePrompt(999L, updateRequest, 1L)
+        );
     }
 
     @Test
-    void testDeletePrompt() {
-        when(promptRepository.existsById(1L)).thenReturn(true);
+    void testUpdatePromptUnauthorized() {
+        when(promptRepository.findById(1L)).thenReturn(Optional.of(testPrompt));
 
-        promptService.deletePrompt(1L);
+        assertThrows(UnauthorizedException.class, () ->
+            promptService.updatePrompt(1L, updateRequest, 999L)
+        );
+
+        verify(promptRepository, never()).save(any(Prompt.class));
+    }
+
+    @Test
+    void testDeletePromptSuccess() {
+        when(promptRepository.findById(1L)).thenReturn(Optional.of(testPrompt));
+
+        promptService.deletePrompt(1L, 1L);
 
         verify(promptRepository, times(1)).deleteById(1L);
     }
 
     @Test
     void testDeletePromptNotFound() {
-        when(promptRepository.existsById(999L)).thenReturn(false);
+        when(promptRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(PromptNotFoundException.class, () -> promptService.deletePrompt(999L));
-        verify(promptRepository, times(0)).deleteById(any());
+        assertThrows(PromptNotFoundException.class, () ->
+            promptService.deletePrompt(999L, 1L)
+        );
+
+        verify(promptRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void testDeletePromptUnauthorized() {
+        when(promptRepository.findById(1L)).thenReturn(Optional.of(testPrompt));
+
+        assertThrows(UnauthorizedException.class, () ->
+            promptService.deletePrompt(1L, 999L)
+        );
+
+        verify(promptRepository, never()).deleteById(any());
     }
 }

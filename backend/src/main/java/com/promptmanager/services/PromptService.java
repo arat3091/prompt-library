@@ -5,6 +5,7 @@ import com.promptmanager.dto.PageResponse;
 import com.promptmanager.dto.PromptResponse;
 import com.promptmanager.dto.UpdatePromptRequest;
 import com.promptmanager.exceptions.PromptNotFoundException;
+import com.promptmanager.exceptions.UnauthorizedException;
 import com.promptmanager.models.Prompt;
 import com.promptmanager.repositories.PromptRepository;
 import org.springframework.data.domain.Page;
@@ -27,7 +28,6 @@ import java.util.stream.Collectors;
 public class PromptService {
 
     private static final Logger logger = LoggerFactory.getLogger(PromptService.class);
-    private static final String DEFAULT_AUTHOR = "system";
     private static final int MAX_PAGE_SIZE = 100;
     private static final int DEFAULT_PAGE_SIZE = 20;
 
@@ -40,18 +40,19 @@ public class PromptService {
     /**
      * Create a new prompt.
      */
-    public PromptResponse createPrompt(CreatePromptRequest request) {
-        logger.debug("Creating new prompt with title: {}", request.getTitle());
+    public PromptResponse createPrompt(CreatePromptRequest request, Long userId) {
+        logger.debug("Creating new prompt with title: {} for user: {}", request.getTitle(), userId);
 
         Prompt prompt = new Prompt();
         prompt.setTitle(request.getTitle());
         prompt.setContent(request.getContent());
         prompt.setDescription(request.getDescription());
         prompt.setCategory(request.getCategory());
-        prompt.setAuthor(DEFAULT_AUTHOR);
+        prompt.setUserId(userId);
+        prompt.setAuthor("user-" + userId);
 
         Prompt savedPrompt = promptRepository.save(prompt);
-        logger.info("Prompt created successfully with ID: {}", savedPrompt.getId());
+        logger.info("Prompt created successfully with ID: {} for user: {}", savedPrompt.getId(), userId);
 
         return mapToResponse(savedPrompt);
     }
@@ -106,13 +107,19 @@ public class PromptService {
     }
 
     /**
-     * Update an existing prompt.
+     * Update an existing prompt (owner only).
      */
-    public PromptResponse updatePrompt(Long id, UpdatePromptRequest request) {
-        logger.debug("Updating prompt with ID: {}", id);
+    public PromptResponse updatePrompt(Long id, UpdatePromptRequest request, Long userId) {
+        logger.debug("Updating prompt with ID: {} by user: {}", id, userId);
 
         Prompt prompt = promptRepository.findById(id)
                 .orElseThrow(() -> new PromptNotFoundException(id));
+
+        // Verify ownership
+        if (!prompt.getUserId().equals(userId)) {
+            logger.warn("Unauthorized update attempt for prompt {} by user {}", id, userId);
+            throw new UnauthorizedException("You can only update your own prompts");
+        }
 
         prompt.setTitle(request.getTitle());
         prompt.setContent(request.getContent());
@@ -120,23 +127,28 @@ public class PromptService {
         prompt.setCategory(request.getCategory());
 
         Prompt updatedPrompt = promptRepository.save(prompt);
-        logger.info("Prompt with ID {} updated successfully", id);
+        logger.info("Prompt with ID {} updated successfully by user: {}", id, userId);
 
         return mapToResponse(updatedPrompt);
     }
 
     /**
-     * Delete a prompt by ID.
+     * Delete a prompt by ID (owner only).
      */
-    public void deletePrompt(Long id) {
-        logger.debug("Deleting prompt with ID: {}", id);
+    public void deletePrompt(Long id, Long userId) {
+        logger.debug("Deleting prompt with ID: {} by user: {}", id, userId);
 
-        if (!promptRepository.existsById(id)) {
-            throw new PromptNotFoundException(id);
+        Prompt prompt = promptRepository.findById(id)
+                .orElseThrow(() -> new PromptNotFoundException(id));
+
+        // Verify ownership
+        if (!prompt.getUserId().equals(userId)) {
+            logger.warn("Unauthorized delete attempt for prompt {} by user {}", id, userId);
+            throw new UnauthorizedException("You can only delete your own prompts");
         }
 
         promptRepository.deleteById(id);
-        logger.info("Prompt with ID {} deleted successfully", id);
+        logger.info("Prompt with ID {} deleted successfully by user: {}", id, userId);
     }
 
     /**
@@ -148,6 +160,7 @@ public class PromptService {
                 prompt.getTitle(),
                 prompt.getContent(),
                 prompt.getAuthor(),
+                prompt.getUserId(),
                 prompt.getDescription(),
                 prompt.getCategory(),
                 prompt.getCreatedAt(),

@@ -1,6 +1,5 @@
 package com.promptmanager.dto;
 
-import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 /**
@@ -12,6 +11,7 @@ public class PromptResponse {
     private String title;
     private String content;
     private String author;
+    private Long userId;
     private String description;
     private String category;
     private LocalDateTime createdAt;
@@ -22,13 +22,14 @@ public class PromptResponse {
     public PromptResponse() {
     }
 
-    public PromptResponse(Long id, String title, String content, String author,
+    public PromptResponse(Long id, String title, String content, String author, Long userId,
                          String description, String category, LocalDateTime createdAt,
                          LocalDateTime updatedAt, Integer version) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.author = author;
+        this.userId = userId;
         this.description = description;
         this.category = category;
         this.createdAt = createdAt;
@@ -67,6 +68,14 @@ public class PromptResponse {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getDescription() {

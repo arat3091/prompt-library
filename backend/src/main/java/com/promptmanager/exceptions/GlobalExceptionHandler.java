@@ -61,6 +61,25 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle UnauthorizedException.
+     */
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(
+            UnauthorizedException ex,
+            WebRequest request) {
+        logger.warn("UnauthorizedException: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden",
+                ex.getMessage()
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    /**
      * Handle validation errors from @Valid annotation.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
