@@ -1,0 +1,84 @@
+<div class="prompt-list-container">
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-section">
+    <p class="error-text">{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="retryLoad()">
+      Retry
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && prompts.length === 0 && !error" class="empty-state">
+    <p>No prompts found</p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Prompts Table -->
+  <table
+    *ngIf="!loading && prompts.length > 0"
+    mat-table
+    [dataSource]="prompts"
+    class="prompts-table">
+
+    <!-- Title Column -->
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef>Title</th>
+      <td mat-cell *matCellDef="let element" class="clickable" (click)="viewPrompt(element.id)">
+        {{ element.title }}
+      </td>
+    </ng-container>
+
+    <!-- Author Column -->
+    <ng-container matColumnDef="author">
+      <th mat-header-cell *matHeaderCellDef>Author</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.author }}
+      </td>
+    </ng-container>
+
+    <!-- Category Column -->
+    <ng-container matColumnDef="category">
+      <th mat-header-cell *matHeaderCellDef>Category</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.category || '-' }}
+      </td>
+    </ng-container>
+
+    <!-- Created Date Column -->
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef>Created</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.createdAt | date: 'short' }}
+      </td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let element">
+        <button
+          mat-icon-button
+          matTooltip="View prompt"
+          (click)="viewPrompt(element.id)">
+          <span>View</span>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <!-- Pagination -->
+  <mat-paginator
+    *ngIf="!loading && prompts.length > 0"
+    [length]="totalElements"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="onPageChange($event)">
+  </mat-paginator>
+</div>

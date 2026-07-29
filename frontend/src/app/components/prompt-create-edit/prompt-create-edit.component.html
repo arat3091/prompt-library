@@ -1,0 +1,96 @@
+<div class="prompt-form-container">
+  <h2>{{ isEditMode ? 'Edit Prompt' : 'Create New Prompt' }}</h2>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-section">
+    <p class="error-text">{{ error }}</p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading" class="prompt-form">
+    <mat-card>
+      <!-- Title Field -->
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" required>
+        <mat-hint align="end">
+          {{ getCharCount('title') }} / {{ getCharLimit('title') }}
+        </mat-hint>
+        <mat-error *ngIf="form.get('title')?.hasError('required')">
+          Title is required
+        </mat-error>
+        <mat-error *ngIf="form.get('title')?.hasError('maxlength')">
+          Title cannot exceed 255 characters
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Category Field -->
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Category</mat-label>
+        <input matInput formControlName="category">
+        <mat-hint align="end">
+          {{ getCharCount('category') }} / {{ getCharLimit('category') }}
+        </mat-hint>
+        <mat-error *ngIf="form.get('category')?.hasError('maxlength')">
+          Category cannot exceed 100 characters
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Description Field -->
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3"></textarea>
+        <mat-hint align="end">
+          {{ getCharCount('description') }} / {{ getCharLimit('description') }}
+        </mat-hint>
+        <mat-error *ngIf="form.get('description')?.hasError('maxlength')">
+          Description cannot exceed 500 characters
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Content Field -->
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Prompt Content</mat-label>
+        <textarea
+          matInput
+          formControlName="content"
+          rows="10"
+          required
+          placeholder="Enter the prompt content here..."></textarea>
+        <mat-hint align="end">
+          {{ getCharCount('content') }} / {{ getCharLimit('content') }}
+        </mat-hint>
+        <mat-error *ngIf="form.get('content')?.hasError('required')">
+          Prompt content is required
+        </mat-error>
+        <mat-error *ngIf="form.get('content')?.hasError('maxlength')">
+          Content cannot exceed 10000 characters
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Buttons -->
+      <div class="button-group">
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          [disabled]="form.invalid || submitting">
+          <mat-spinner *ngIf="submitting" diameter="20" class="spinner"></mat-spinner>
+          {{ submitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') }}
+        </button>
+        <button
+          type="button"
+          mat-button
+          (click)="onCancel()"
+          [disabled]="submitting">
+          Cancel
+        </button>
+      </div>
+    </mat-card>
+  </form>
+</div>

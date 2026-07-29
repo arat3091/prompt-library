@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * REST Controller for User management and authentication endpoints.
  */
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);

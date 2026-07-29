@@ -1,0 +1,70 @@
+<div class="prompt-detail-container">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error && !loading" class="error-section">
+    <p class="error-text">{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="retryLoad()">
+      Retry
+    </button>
+  </div>
+
+  <!-- Prompt Content -->
+  <div *ngIf="prompt && !loading && !error" class="prompt-content">
+    <div class="header-section">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>{{ prompt.title }}</h1>
+    </div>
+
+    <mat-card class="prompt-card">
+      <!-- Metadata -->
+      <div class="metadata">
+        <div class="metadata-item">
+          <strong>Author:</strong> {{ prompt.author }}
+        </div>
+        <div class="metadata-item">
+          <strong>Category:</strong> {{ prompt.category || '-' }}
+        </div>
+        <div class="metadata-item">
+          <strong>Created:</strong> {{ prompt.createdAt | date: 'medium' }}
+        </div>
+        <div class="metadata-item">
+          <strong>Last Updated:</strong> {{ prompt.updatedAt | date: 'medium' }}
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div *ngIf="prompt.description" class="description-section">
+        <h3>Description</h3>
+        <p>{{ prompt.description }}</p>
+      </div>
+
+      <!-- Content -->
+      <div class="content-section">
+        <h3>Prompt Content</h3>
+        <pre class="prompt-text">{{ prompt.content }}</pre>
+      </div>
+
+      <!-- Edit Button (Author Only) -->
+      <div *ngIf="isAuthor" class="actions-section">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="editPrompt()">
+          <mat-icon>edit</mat-icon>
+          Edit Prompt
+        </button>
+      </div>
+
+      <!-- Sign In Message (Not Author) -->
+      <div *ngIf="!isAuthor && !currentUser" class="sign-in-message">
+        <p>Sign in to edit prompts</p>
+      </div>
+    </mat-card>
+  </div>
+</div>

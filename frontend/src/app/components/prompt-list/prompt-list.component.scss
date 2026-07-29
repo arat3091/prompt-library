@@ -1,0 +1,71 @@
+.prompt-list-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.prompts-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f9f9f9;
+    }
+  }
+}
+
+.clickable {
+  cursor: pointer;
+  color: #1976d2;
+  text-decoration: underline;
+
+  &:hover {
+    color: #1565c0;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.error-section {
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+
+  .error-text {
+    color: #c62828;
+    margin-bottom: 15px;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+mat-paginator {
+  border-top: 1px solid #e0e0e0;
+}
