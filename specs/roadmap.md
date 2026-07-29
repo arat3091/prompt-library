@@ -7,12 +7,12 @@
 - [x] Create directory organization (src, models, services, controllers, etc.)
 - [x] Set up development environment and build scripts
 
-## Phase 2: Core Backend API
-- [ ] Design Prompt data model/entity
-- [ ] Create in-memory data store/repository
-- [ ] Implement CRUD endpoints (POST, GET, PUT, DELETE)
-- [ ] Add input validation
-- [ ] Implement basic error handling
+## Phase 2: Core Backend API ✅ COMPLETED
+- [x] Design Prompt data model/entity
+- [x] Create in-memory data store/repository
+- [x] Implement CRUD endpoints (POST, GET, PUT, DELETE)
+- [x] Add input validation
+- [x] Implement basic error handling
 
 ## Phase 3: Authentication & Authorization
 - [ ] Implement user identification (simple session-based or JWT)
